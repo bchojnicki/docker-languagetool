@@ -1,0 +1,31 @@
+steps:
+  # Build image using existing Dockerfile
+  - name: 'gcr.io/cloud-builders/docker'
+    id: Build
+    args: 
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/language-tool:latest'
+      - '.'
+  # Push an image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    id: Push
+    args: [ 'push', 'gcr.io/$PROJECT_ID/language-tool:latest']
+  # Deploy an image from Container Registry to Cloud Run
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: Deploy
+    args:
+    - 'run'
+    - 'deploy'
+    - 'docker-languagetool'
+    - '--image'
+    - 'gcr.io/$PROJECT_ID/language-tool:latest'
+    - '--region'
+    - 'europe-west4'
+    - '--port'
+    - '8010'
+    - '--memory'
+    - '1Gi'
+    - '--platform'
+    - 'managed'
+    - '--allow-unauthenticated'
